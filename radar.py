@@ -16,11 +16,11 @@ radarCenter = (width // 2, height // 2)
 
 lineLen = radarRadius
 lineColor = 'red'
-lineRotationSpeed = 90 # Degree per second
-lineWidth = 2
+lineRotationSpeed = 180 # Degree per second
 
 signalLineWidth = 30 # Degrees
-noOfLines = signalLineWidth / lineWidth
+noOfLines = 30
+lineWidth = int(signalLineWidth / noOfLines) 
 
 noOfCircles = 4
 distBwCircles = radarRadius / noOfCircles
