@@ -1,0 +1,37 @@
+import pygame
+import sys
+
+# Initialize Pygame
+pygame.init()
+
+# Create a window
+screen = pygame.display.set_mode((800, 600))
+
+# Create a surface with alpha channel (SRCALPHA flag)
+circle_surface = pygame.Surface((200, 200), pygame.SRCALPHA)
+
+# Set the alpha value of the entire surface (255 is fully opaque, 0 is fully transparent)
+circle_surface.set_alpha(128)  # 50% opacity
+
+# Draw a circle on the surface
+pygame.draw.circle(circle_surface, (255, 0, 0), (100, 100), 100, 10)  # Red circle
+
+# Main loop
+running = True
+while running:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
+        
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            circle_surface.get_rect(center=event.pos)
+
+    # Clear screen
+    screen.fill('white')
+
+    # Blit the circle surface onto the main screen
+    screen.blit(circle_surface, (300, 200))
+
+    # Update display
+    pygame.display.flip()
