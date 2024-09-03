@@ -2,40 +2,91 @@ import pygame
 from pygame.locals import *
 import math
 
+
+
 pygame.init()
 
+width = 1000
+height = 1000
+screen = pygame.display.set_mode((width, height))
+bgColor = 'black'
+frameRate = 60
 
-radar_width = 500
-radar_height = 500
-radar_screen = pygame.display.set_mode((radar_width, radar_height))
-radar_bgColor = 'black'
-radar_center = (radar_width // 2, radar_height // 2)
-radar_radius = [10, 50, 100, 150]
+radarRadius = 400
+radarCenter = (width // 2, height // 2)
 
-arrow_length =  30
-arrow_color = 'red'
+lineLen = radarRadius
+lineColor = 'red'
+lineRotationSpeed = 90 # Degree per second
+
+signalLineWidth = 30 # Degrees
+noOfLines = 15
+lineWidth = int(signalLineWidth / noOfLines) 
+
+noOfCircles = 4
+distBwCircles = radarRadius / noOfCircles
+circleWidth = 5
+circleColor = 'green'
+
+
+class Radar:
+    def __init__(self) -> None:
+        self.surf = pygame.Surface((radarRadius * 2, radarRadius * 2))
+        self.rect = self.surf.get_rect(center=radarCenter)
+        self.lineLen = lineLen
+        self.lineAngle = 0
+        self.linesList = []
+        self.detectedPoints = []
+        self.initializeLines()
+
+    def initializeLines(self):
+        for i in range(int(noOfLines)):
+            surf = pygame.Surface((radarRadius * 4, radarRadius * 4), SRCALPHA)
+            surf.set_alpha(255 * (i / noOfLines))
+            self.linesList.append(surf)
+
+    def draw(self):
+        for radar in [circle * distBwCircles for circle in range(1, noOfCircles + 1)]:
+            pygame.draw.aacircle(screen, circleColor, radarCenter, radar, circleWidth)
+
+        pygame.draw.line(screen, circleColor, (radarCenter[-1], radarCenter[1] + radarRadius), (radarCenter[0], radarCenter[1] - radarRadius))
+        pygame.draw.line(screen, circleColor, (radarCenter[0] + radarRadius, radarCenter[1]), (radarCenter[0] - radarRadius, radarCenter[1]))
+         
+        for i, line in enumerate(self.linesList):
+            lineX = radarCenter[0] + lineLen * math.cos(math.radians(self.lineAngle + i * lineWidth))
+            lineY = radarCenter[1] + lineLen * math.sin(math.radians(self.lineAngle + i * lineWidth))
+
+            pygame.draw.line(line, lineColor, radarCenter, (lineX, lineY), lineWidth)
+
+            screen.blit(line, line.get_rect())
+            line.fill((0, 0, 0, 0))
+        
+
+    def update(self):
+        self.lineAngle += lineRotationSpeed / frameRate
+        pass
+
+
+radar = Radar()
 
 clock = pygame.time.Clock()
 running = True
-angle = 135
 
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
 
-    radar_screen.fill(radar_bgColor)
-    for radar in radar_radius:
-        pygame.draw.circle(radar_screen, 'green', radar_center, radar, 2)
+    screen.fill(bgColor)
+    radar.draw()
+    radar.update()
 
+    clock.tick(frameRate)
+    screen.fill(bgColor)
+    radar.draw()
+    radar.update()
 
-
-    arrow_x = radar_center[0] + arrow_length * math.cos(math.radians(angle))
-    arrow_y = radar_center[1] - arrow_length * math.sin(math.radians(angle))
-
-    pygame.draw.line(radar_screen, arrow_color, radar_center, (arrow_x, arrow_y), 3)
-
+    clock.tick(frameRate)
     pygame.display.flip()
-    clock.tick(60)
 
 pygame.quit()
