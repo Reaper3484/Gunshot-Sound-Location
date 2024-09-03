@@ -5,18 +5,18 @@ import math
 
 pygame.init()
 
-width = 1000
-height = 1000
-screen = pygame.display.set_mode((width, height), SRCALPHA)
+width = 500
+height = 500
+screen = pygame.display.set_mode((width, height))
 bgColor = 'white'
 
 noOfMics = 4
-micRadius = 5
+micRadius = 7
 micIdleColor = 'grey'
 micDetectedColor = 'green'
 
-micArrayRadius = 10
-micArrayWidth = 10
+micArrayRadius = 50
+micArrayWidth = 3
 micArrayCenter = (width // 2, height // 2)
 arrayColor = 'light grey'
 
@@ -34,7 +34,69 @@ soundSpeed = 343
 
 class DetectionSystem():
     def __init__(self) -> None:
-        pass
+        self.mics = []
+        self.source = Source(sourcePos)
+        self.detected = False
+        self.inititalizeMics()
+
+    def inititalizeMics(self):
+        angleOffset = 2 * math.pi / noOfMics
+        angle = 0
+        for _ in range(noOfMics):
+            x = micArrayRadius * math.cos(angle)
+            y = micArrayRadius * math.sin(angle)
+            self.mics.append(Mic((x,y)))
+            angle += angleOffset
+    
+    def detectSoundWave(self):
+        if Mic.allMicsDetected == noOfMics:
+            self.calculateAngle()
+            self.detected = True
+    
+    def calculateAngle(self):
+        timeDiff = self.mics[1].timeStamp - self.mics[3].timeStamp
+        value = (timeDiff * soundSpeed) / (2*micArrayRadius)
+        angle = math.degrees(math.asin(value))
+        print("Angle: ", angle)
+    
+    def resetMics(self):
+        for mic in self.mics:
+            mic.timeStamp = 0
+            mic.color = micIdleColor
+        
+        Mic.allMicsDetected = 0
+        print("Mic Ready for next Wave")
+    
+    def update(self):
+        self.detectSoundWave()
+        if self.detected:
+            self.resetMics()
+            self.detected = False
+
+    def drawMics(self):
+        pygame.draw.circle(screen, arrayColor, micArrayCenter, micArrayRadius + micArrayWidth //2, micArrayWidth)
+        for mic in self.mics:
+            mic.draw()
+
+
+    def draw(self):
+        self.drawMics()
+        self.source.draw()
+    
+    def handleEvent(self, event):
+        if event.type == KEYDOWN and event.key == K_SPACE:
+            # if self.readyForNextWave:
+            self.source.fireShot()
+            
+        if event.type == MOUSEBUTTONDOWN:
+            self.source.rect.center = event.pos
+    
+    def updateMics(self):
+        for mic in self.mics:
+            mic.update(self.source)
+    
+    def updateSource(self):
+        self.source.update()
 
 
 class Mic():
@@ -51,6 +113,9 @@ class Mic():
 
     def checkCollision(self, source):
         for wave in source.soundWaves:
+            if self in wave['detected']:
+                continue
+
             center = wave['center']
             distance = math.sqrt((self.rect.centerx - center[0]) ** 2 + (self.rect.centery - center[1]) ** 2)
             if distance <= wave['radius']:
@@ -59,6 +124,7 @@ class Mic():
                     self.color = micDetectedColor
                     print(f"Mic at {self.position} detected collision at {self.timeStamp} ms")
                     Mic.allMicsDetected += 1
+                    wave['detected'].append(self)
 
     def draw(self):
         pygame.draw.circle(screen, self.color, self.rect.center, micRadius)
@@ -110,7 +176,8 @@ class Source():
             'surf': surf,
             'edgeDistance': edgeDistance,
             'center': self.rect.center,
-            'radius': 0
+            'radius': 0,
+            'detected': []
         })
 
     def update(self):
@@ -119,62 +186,25 @@ class Source():
             pass
 
 
-micsList = []
 
-angleOffset = 2 * math.pi / noOfMics
-angle = 0
-
-for _ in range(noOfMics):
-    x = micArrayRadius * math.cos(angle)        
-    y = micArrayRadius * math.sin(angle)        
-    micsList.append(Mic((x, y)))
-    angle += angleOffset
-
-source = Source(sourcePos)
-
-        
-def drawMics():
-    pygame.draw.circle(screen, arrayColor, micArrayCenter, micArrayRadius + micArrayWidth // 2, micArrayWidth)
-    for mic in micsList:
-        mic.draw()
-
-
-def updateMics(source):
-    for mic in micsList:
-        mic.update(source)
-
-
-def calculateAngle():
-    if(Mic.angleCalculated == False):
-        timeDiff = micsList[1].timeStamp - micsList[3].timeStamp
-        value = (timeDiff * soundSpeed) / (2*micArrayRadius)
-        angle = math.degrees(math.asin(value))
-        print("Angle: ", angle)
-        Mic.angleCalculated =True
-
+detectionSystem = DetectionSystem()
 
 clock = pygame.time.Clock()
 running = True
 while (running):
+
     for ev in pygame.event.get():
-        if ev.type == QUIT or ev.type == KEYDOWN and ev.key == K_ESCAPE:
+        if ev.type == QUIT or (ev.type == KEYDOWN and ev.key == K_ESCAPE):
             running = False
-
-        if ev.type == KEYDOWN:
-            if ev.key == K_SPACE:
-                Mic.allMicsDetected = 0
-                source.fireShot()
         
-        if ev.type == MOUSEBUTTONDOWN:
-            source.rect.center = ev.pos
-
+        detectionSystem.handleEvent(ev)
+        
     screen.fill(bgColor)
 
-    drawMics()
-    updateMics(source)
-
-    source.draw()
-    source.update()
+    detectionSystem.draw()
+    detectionSystem.updateMics()
+    detectionSystem.updateSource()
+    detectionSystem.update()
 
     clock.tick(60)
     pygame.display.flip()
