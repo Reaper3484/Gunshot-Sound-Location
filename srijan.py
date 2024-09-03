@@ -31,6 +31,12 @@ updateRate = 10
 
 soundSpeed = 343
 
+
+class DetectionSystem():
+    def __init__(self) -> None:
+        pass
+
+
 class Mic():
     allMicsDetected = 0
     angleCalculated = False
@@ -126,6 +132,7 @@ for _ in range(noOfMics):
 
 source = Source(sourcePos)
 
+        
 def drawMics():
     pygame.draw.circle(screen, arrayColor, micArrayCenter, micArrayRadius + micArrayWidth // 2, micArrayWidth)
     for mic in micsList:
@@ -135,6 +142,7 @@ def drawMics():
 def updateMics(source):
     for mic in micsList:
         mic.update(source)
+
 
 def calculateAngle():
     if(Mic.angleCalculated == False):
@@ -161,12 +169,13 @@ while (running):
             source.rect.center = ev.pos
 
     screen.fill(bgColor)
+
     drawMics()
     updateMics(source)
+
     source.draw()
     source.update()
-    if Mic.allMicsDetected == 4 :
-        calculateAngle()
+
     clock.tick(60)
     pygame.display.flip()
 
