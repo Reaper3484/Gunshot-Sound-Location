@@ -3,6 +3,7 @@ from pygame.locals import *
 import math
 
 
+
 pygame.init()
 
 width = 1000
@@ -16,10 +17,10 @@ radarCenter = (width // 2, height // 2)
 
 lineLen = radarRadius
 lineColor = 'red'
-lineRotationSpeed = 180 # Degree per second
+lineRotationSpeed = 90 # Degree per second
 
 signalLineWidth = 30 # Degrees
-noOfLines = 30
+noOfLines = 15
 lineWidth = int(signalLineWidth / noOfLines) 
 
 noOfCircles = 4
@@ -76,6 +77,11 @@ while running:
         if event.type == pygame.QUIT:
             running = False
 
+    screen.fill(bgColor)
+    radar.draw()
+    radar.update()
+
+    clock.tick(frameRate)
     screen.fill(bgColor)
     radar.draw()
     radar.update()
