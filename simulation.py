@@ -2,13 +2,17 @@ from radar import Radar
 from config import *
 
 
+pygame.mixer.init()
+shots_fired = pygame.mixer.Sound("./assets/sounds/shot2.mp3")
+
+
 class DetectionSystem():
-    def __init__(self) -> None:
+    def __init__(self, radar) -> None:
         self.surf = pygame.Surface((simWidth, height))
         self.mics = []
         self.source = Source(sourcePos, self.surf)
         self.detected = False
-        self.sourceAngle = 0
+        self.radar = radar
         self.inititalizeMics()
 
     def inititalizeMics(self):
@@ -27,17 +31,45 @@ class DetectionSystem():
 
     def calculateAngle(self):
         timeDiff = self.mics[1].timeStamp - self.mics[3].timeStamp
-        value = (timeDiff * soundSpeed) / (2 * micArrayRadius)
-        angle = math.degrees(math.asin(value))
-        print("Angle: ", angle)
+        value = (timeDiff * soundSpeed) / (2*micArrayRadius)
+        if(value > 1 or value < -1):
+            value = 1
+        try:
+            angle = math.degrees(math.acos(value))
+            angle = 90 - angle
+        except:
+            print("Math Value Error", value)
 
+        print("Angle: ", angle)
+        self.sourceAngleProvider(angle)
+
+    def sourceAngleProvider(self, angle):
+        sortedMics = sorted(self.mics, key=lambda mic: mic.timeStamp if mic.timeStamp != 0 else float('inf'))
+        if(self.mics[0] == sortedMics[0] and self.mics[1] == sortedMics[1]) or (self.mics[0] == sortedMics[1] and self.mics[1] == sortedMics[0]):
+            angle = abs(angle)
+        if (sortedMics[0] == self.mics[1] and sortedMics[1] == self.mics[2]) or (sortedMics[0] == self.mics[2] and sortedMics[1] == self.mics[1]):
+            angle = (90 - abs(angle)) + 90
+        if (sortedMics[0] == self.mics[2] and sortedMics[1] == self.mics[3]) or (sortedMics[0] == self.mics[3] and sortedMics[1] == self.mics[2]):
+            angle = (abs(angle)) + 180
+        if (sortedMics[0] == self.mics[3] and sortedMics[1] == self.mics[0]) or (sortedMics[0] == self.mics[0] and sortedMics[1] == self.mics[3]):
+            angle = (90 - abs(angle)) + 270
+        if (angle == -90 ):
+            angle = 90
+        if (angle == 0 and sortedMics[0] == self.mics[0]):
+            angle = 0
+        if (angle == 0 and sortedMics[0] == self.mics[2]):
+            angle = 180
+        if (angle == 90 ):
+            angle = 270
+        
+        self.radar.addBlip(angle)
+        
     def resetMics(self):
         for mic in self.mics:
             mic.timeStamp = 0
             mic.color = micIdleColor
 
         Mic.allMicsDetected = 0
-        print("Mic Ready for next Wave")
 
     def update(self):
         for mic in self.mics:
@@ -64,6 +96,7 @@ class DetectionSystem():
 
     def handleEvent(self, event):
         if event.type == KEYDOWN and event.key == K_SPACE:
+            shots_fired.play()
             self.source.fireShot()
 
         if event.type == MOUSEBUTTONDOWN:
@@ -98,8 +131,6 @@ class Mic():
                 if self.timeStamp == 0:
                     self.timeStamp = distance / soundSpeed
                     self.color = micDetectedColor
-                    print(
-                        f"Mic at {self.position} detected collision at {self.timeStamp} ms")
                     Mic.allMicsDetected += 1
                     wave['detected'].append(self)
 
@@ -167,8 +198,8 @@ class Source():
             pass
 
 
-detectionSystem = DetectionSystem()
 radar = Radar(screen, simWidth, radarWidth, height)
+detectionSystem = DetectionSystem(radar)
 
 clock = pygame.time.Clock()
 running = True
