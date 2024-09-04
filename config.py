@@ -46,3 +46,7 @@ noOfCircles = 4
 distBwCircles = radarRadius / noOfCircles
 circleWidth = 5
 circleColor = 'green'
+
+blipDistanceCenter = radarRadius * (2 / 3)
+fade_duration = 3000  # 3 seconds in milliseconds
+blink_speed = 7
