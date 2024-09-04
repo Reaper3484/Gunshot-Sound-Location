@@ -8,6 +8,7 @@ class DetectionSystem():
         self.mics = []
         self.source = Source(sourcePos, self.surf)
         self.detected = False
+        self.sourceAngle = 0
         self.inititalizeMics()
 
     def inititalizeMics(self):
