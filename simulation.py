@@ -2,10 +2,6 @@ from radar import Radar
 from config import *
 
 
-pygame.mixer.init()
-shots_fired = pygame.mixer.Sound("./assets/sounds/shot1.mp3")
-
-
 class DetectionSystem():
     def __init__(self, radar) -> None:
         self.surf = pygame.Surface((simWidth, height))
@@ -63,6 +59,7 @@ class DetectionSystem():
             angle = 270
         
         self.radar.addBlip(angle)
+        BlipSound.play()
         
     def resetMics(self):
         for mic in self.mics:
@@ -96,7 +93,7 @@ class DetectionSystem():
 
     def handleEvent(self, event):
         if event.type == KEYDOWN and event.key == K_SPACE:
-            shots_fired.play()
+            BulletSound.play()
             self.source.fireShot()
 
         if event.type == MOUSEBUTTONDOWN:
@@ -133,6 +130,8 @@ class Mic():
                     self.color = micDetectedColor
                     Mic.allMicsDetected += 1
                     wave['detected'].append(self)
+                    micDetectPing.play()
+
 
     def draw(self):
         pygame.draw.circle(self.screen, self.color,

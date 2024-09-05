@@ -12,6 +12,7 @@ frameRate = 60
 simWidth = width * (2 / 3)
 radarWidth = width / 3
 
+# Detection System
 noOfMics = 4
 micRadius = 7
 micIdleColor = 'grey'
@@ -28,7 +29,7 @@ sourceSize = (10, 10)
 
 soundWaveColor = ('white')
 soundWaveWidth = 10
-soundWaveSpeed = 9
+soundWaveSpeed = 5
 updateRate = 10
 
 soundSpeed = 343
@@ -48,5 +49,11 @@ circleWidth = 5
 circleColor = 'green'
 
 blipDistanceCenter = radarRadius * (2 / 3)
-fade_duration = 3000  # 3 seconds in milliseconds
-blink_speed = 7
+fade_duration = 8000  # 3 seconds in milliseconds
+blink_speed = 1.5
+
+# Sound
+pygame.mixer.init()
+BulletSound = pygame.mixer.Sound("./assets/sounds/shot1.mp3")
+micDetectPing = pygame.mixer.Sound("./assets/sounds/ping2.mp3")
+BlipSound = pygame.mixer.Sound("./assets/sounds/ping3.mp3")

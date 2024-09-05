@@ -29,22 +29,22 @@ class Radar:
             self.drawBlip(blip)
 
         pygame.draw.line(self.surf, lineColor, self.radarCenter, (lineX, lineY), lineWidth)
-
         self.screen.blit(self.surf, (self.simWidth, 0))
 
     def drawBlip(self, blip):
         currentTime = pygame.time.get_ticks()
         dotX = self.radarCenter[0] + blipDistanceCenter * math.cos(math.radians(blip['angle']))
         dotY = self.radarCenter[1] + blipDistanceCenter * math.sin(math.radians(blip['angle']))
-        redDot_rect = blip['surf'].get_rect(center=(dotX, dotY))
         elapsed_time = currentTime - blip['timer']
 
         if elapsed_time < fade_duration:
-            alpha = abs(math.sin(math.pi * blink_speed*(elapsed_time / 2 * math.pi))) * 255
+            alpha = abs(math.sin(blink_speed * elapsed_time / 1000))* 255
             blip['surf'].set_alpha(alpha)
-
-            self.surf.blit(blip['surf'], redDot_rect)
-
+             
+            self.surf.blit(blip['surf'], (dotX, dotY))
+        else:
+            self.blips.remove(blip)
+              
     def addBlip(self, angle):
         redDotImage = pygame.image.load("./assets/images/reddot1.png")
         redDotImage = pygame.transform.scale(redDotImage, (50, 50))
@@ -52,7 +52,7 @@ class Radar:
             'surf': redDotImage,
             'angle': angle,
             'timer': pygame.time.get_ticks()
-        })
-
+        })   
+             
     def update(self):
         self.lineAngle = (self.lineAngle + lineRotationSpeed / frameRate) % 360
