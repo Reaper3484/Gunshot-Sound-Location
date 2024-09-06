@@ -28,8 +28,10 @@ class DetectionSystem():
     def calculateAngle(self):
         timeDiff = self.mics[1].timeStamp - self.mics[3].timeStamp
         value = (timeDiff * soundSpeed) / (2*micArrayRadius)
-        if(value > 1 or value < -1):
+        if(value > 1):
             value = 1
+        elif(value <-1):
+            value = -1
         try:
             angle = math.degrees(math.acos(value))
             angle = 90 - angle

@@ -43,17 +43,19 @@ lineRotationSpeed = 120 # Degree per second
 lineWidth = 3
 lineTrailAlpha = 100
 
-noOfCircles = 4
+noOfCircles = 1
 distBwCircles = radarRadius / noOfCircles
 circleWidth = 5
 circleColor = 'green'
 
 blipDistanceCenter = radarRadius * (2 / 3)
-fade_duration = 8000  # 3 seconds in milliseconds
-blink_speed = 1.5
+fade_duration = 8000  # milliseconds
+blink_speed = 1.6
 
 # Sound
 pygame.mixer.init()
+pygame.mixer.set_num_channels(32)
 BulletSound = pygame.mixer.Sound("./assets/sounds/shot1.mp3")
 micDetectPing = pygame.mixer.Sound("./assets/sounds/ping2.mp3")
-BlipSound = pygame.mixer.Sound("./assets/sounds/ping3.mp3")
+BlipSound = pygame.mixer.Sound("./assets/sounds/ping3loud.mp3")
+BlipSound.set_volume(1)
