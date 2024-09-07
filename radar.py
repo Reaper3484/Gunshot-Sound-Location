@@ -6,6 +6,7 @@ class Radar:
         self.surf = pygame.Surface((radarWidth, height), SRCALPHA)
         self.radarCenter = (radarWidth // 2, height // 2)
         self.rect = self.surf.get_rect(center=self.radarCenter)
+        self.font = pygame.font.SysFont(None, 30)
         self.screen = screen
         self.width = radarWidth
         self.simWidth = simWidth
@@ -29,6 +30,7 @@ class Radar:
             self.drawBlip(blip)
 
         pygame.draw.line(self.surf, lineColor, self.radarCenter, (lineX, lineY), lineWidth)
+        self.drawDirections()
         self.screen.blit(self.surf, (self.simWidth, 0))
 
     def drawBlip(self, blip):
@@ -53,6 +55,25 @@ class Radar:
             'angle': angle,
             'timer': pygame.time.get_ticks()
         })   
-             
+
+    def drawDirections(self):
+        directions = {
+            "N": 270,
+            "NE": 315,
+            "E": 0,
+            "SE": 45,
+            "S": 90,
+            "SW": 135,
+            "W": 180,
+            "NW": 225
+        }
+
+        for direction, angle in directions.items():
+            label = self.font.render(direction, True, circleColor)
+            angle_rad = math.radians(angle)
+            label_x = self.radarCenter[0] + (radarRadius + 20) * math.cos(angle_rad) - label.get_width() / 2
+            label_y = self.radarCenter[1] + (radarRadius + 20) * math.sin(angle_rad) - label.get_height() / 2
+            self.surf.blit(label, (label_x, label_y))
+
     def update(self):
         self.lineAngle = (self.lineAngle + lineRotationSpeed / frameRate) % 360

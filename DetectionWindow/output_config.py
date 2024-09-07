@@ -6,11 +6,13 @@ from pygame.locals import *
 width = 800    
 height = width
 screen = pygame.display.set_mode((width, height))
+pygame.font.init()
 bgColor = 'black'
 frameRate = 60
 
 radarWidth = width
-radarRadius = radarWidth // 2 - 20
+radarEdgeDist = 40
+radarRadius = radarWidth // 2 - radarEdgeDist
 
 lineLen = radarRadius
 lineColor = 'red'
