@@ -1,4 +1,4 @@
-from output_config import *
+from config_rt import *
 
 
 class Radar:

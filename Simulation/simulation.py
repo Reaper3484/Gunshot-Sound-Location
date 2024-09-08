@@ -38,7 +38,6 @@ class DetectionSystem():
         except:
             print("Math Value Error", value)
 
-        print("Angle: ", angle)
         self.sourceAngleProvider(angle)
 
     def sourceAngleProvider(self, angle):
@@ -218,6 +217,6 @@ while (running):
     detectionSystem.update()
 
     clock.tick(frameRate)
-    pygame.display.flip()
+    pygame.display.update()
 
 pygame.quit()
