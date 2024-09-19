@@ -1,7 +1,10 @@
 import math
 import pygame
 from pygame.locals import *
+import os
 
+
+base_dir = os.path.dirname(os.path.abspath(__file__))
 
 width = 1900    
 height = width // 2
@@ -53,11 +56,15 @@ circleColor = 'green'
 blipDistanceCenter = radarRadius * (2 / 3)
 fade_duration = 8000  # milliseconds
 blink_speed = 1.6
+redDotImagePath = os.path.join(base_dir, "assets/images/reddot1.png")
 
 # Sound
 pygame.mixer.init()
 pygame.mixer.set_num_channels(32)
-BulletSound = pygame.mixer.Sound("./assets/sounds/shot1.mp3")
-micDetectPing = pygame.mixer.Sound("./assets/sounds/ping2.mp3")
-BlipSound = pygame.mixer.Sound("./assets/sounds/ping3loud.mp3")
+BulletSoundPath = os.path.join(base_dir, "assets/sounds/shot1.mp3")
+BulletSound = pygame.mixer.Sound(BulletSoundPath)
+micDetectPingPath = os.path.join(base_dir, "assets/sounds/ping2.mp3")
+micDetectPing = pygame.mixer.Sound(micDetectPingPath)
+BlipSoundPath = os.path.join(base_dir, "assets/sounds/ping3loud.mp3") 
+BlipSound = pygame.mixer.Sound(BlipSoundPath)
 BlipSound.set_volume(1)

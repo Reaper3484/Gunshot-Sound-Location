@@ -48,7 +48,7 @@ class Radar:
             self.blips.remove(blip)
               
     def addBlip(self, angle):
-        redDotImage = pygame.image.load("./assets/images/reddot1.png")
+        redDotImage = pygame.image.load(redDotImagePath)
         redDotImage = pygame.transform.scale(redDotImage, (50, 50))
         self.blips.append({
             'surf': redDotImage,
